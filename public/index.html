@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KingJack Uploader</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #0a0a0f, #101020, #050506);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .upload-box {
+      background: #1b1b2f;
+      border: 2px dashed #3f3f5f;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      transition: 0.3s;
+      box-shadow: 0 0 20px rgba(109, 109, 255, 0.1);
+    }
+    .upload-box:hover {
+      border-color: #6d6dff;
+      background: #1d1d3b;
+      box-shadow: 0 0 25px rgba(109, 109, 255, 0.2);
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .btn {
+      background: linear-gradient(90deg, #6d28d9, #3b82f6);
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      opacity: 0.9;
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+  <header class="text-3xl font-bold mb-6">
+    <img src="https://i.ibb.co/yp2v9tS/icon.png" alt="logo" width="40" height="40" class="rounded-full">
+    <span class="text-indigo-400">KingJack</span> Uploader
+  </header>
+
+  <div class="upload-box">
+    <p class="mb-3 text-gray-400">Supports all file types — drag or click below 👇</p>
+    <label for="fileInput" class="btn">Choose File</label>
+    <input type="file" id="fileInput" />
+
+    <div id="result" class="mt-6 text-sm"></div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const result = document.getElementById('result');
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      result.innerHTML = "⏳ Uploading...";
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.url) {
+          result.innerHTML = `
+            ✅ Uploaded successfully!<br>
+            <a href="${data.url}" class="text-blue-400 underline break-all" target="_blank">${data.url}</a>
+          `;
+        } else {
+          result.innerHTML = "❌ Upload failed.";
+        }
+      } catch (err) {
+        result.innerHTML = "⚠️ Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
